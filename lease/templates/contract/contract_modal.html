@@ -1,0 +1,51 @@
+<!-- 분개정보 Modal -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="true" tabindex="-1"
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel"><div id="lease_txt"></div></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12" id="ex1_Result1" ></div>
+            <div class="col-lg-12" id="ex1_Result2" ></div>
+        </div>
+        <table align="center">
+          <tr valign="top">
+<!--              차변-->
+            <td>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col" colspan="2" class="text-center">차변</th>
+            </tr>
+          </thead>
+          <tbody id="debit">
+          </tbody>
+        </table>
+            </td>
+<!--              대변-->
+            <td>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col" colspan="2" class="text-center">대변</th>
+            </tr>
+          </thead>
+          <tbody id="credit">
+          </tbody>
+        </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>

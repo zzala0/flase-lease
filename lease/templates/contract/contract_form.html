@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h5 class="my-3 border-bottom pb-2">계약 등록</h5>
+    <form method="post" class="post-form my-3">
+        {{ form.csrf_token }}
+        <!-- 오류표시 Start -->
+        {% include "form_errors.html" %}
+
+        <div class="form-group">
+            <label for="subject">제목</label>
+            <input type="text" class="form-control" name="subject" id="subject"
+                   value="{{ form.subject.data or '' }}">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="leasecls_id">리스구분</label>{{ form.leasecls_id.data }}
+                <select class="form-control" name="leasecls_id" id="leasecls_id">
+                    {% for leasecls in leasecls_list %}
+                    <option value="{{ leasecls.id }}" {% if leasecls.id == form.leasecls_id.data %}selected{% endif%}>{{ leasecls.clsname }}</option>
+                    {% endfor%}
+                </select>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label for="startdate">계약시작일</label>{{ form.startdate.data }}
+                <input type="date" class="form-control" name="startdate" id="startdate"
+                       value="{{ form.startdate.data or '' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="enddate">계약종료일</label>
+                <input type="date" class="form-control" name="enddate" id="enddate"
+                       value="{{ form.enddate.data or '' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="rate">할인율</label>
+                <input type="number" step="0.000001" class="form-control" name="rate" id="rate"
+                       value="{{ form.rate.data or '' }}">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="lease_fee">고정리스료</label>
+                <input type="number" class="form-control" name="lease_fee" id="lease_fee"
+                       value="{{ form.lease_fee.data or '0' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="init_fee">최초리스료</label>
+                <input type="number" class="form-control" name="init_fee" id="init_fee"
+                       value="{{ form.init_fee.data or '0' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="deposit">보증금</label>
+                <input type="number" class="form-control" name="deposit" id="deposit"
+                       value="{{ form.deposit.data or '0' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="rstr_alwn">복구충당부채</label>
+                <input type="number" class="form-control" name="rstr_alwn" id="rstr_alwn"
+                       value="{{ form.rstr_alwn.data or '0' }}">
+            </div>
+        </div>
+
+        <button class="btn btn-warning my-3" type="button" data-toggle="collapse" data-target="#collapseExample"
+                aria-expanded="false" aria-controls="collapseExample">
+        과거자료 입력
+        </button>
+        <div class="collapse" id="collapseExample">
+
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="prnt_asset">이전 사용권자산(자산 순액)</label>
+                <input type="number" class="form-control" name="prnt_asset" id="prnt_asset"
+                       value="{{ form.prnt_asset.data or '0' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="prnt_depac">이전 상각누계액</label>
+                <input type="number" class="form-control" name="prnt_depac" id="prnt_depac"
+                       value="{{ form.prnt_depac.data or '0' }}">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="prnt_lblti">이전 리스부채</label>
+                <input type="number" class="form-control" name="prnt_lblti" id="prnt_lblti"
+                       value="{{ form.prnt_lblti.data or '0' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="prnt_dpsit">이전 보증금현할차</label>
+                <input type="number" class="form-control" name="prnt_dpsit" id="prnt_dpsit"
+                       value="{{ form.prnt_dpsit.data or '0' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="prnt_rstra">이전 복구충당부채</label>
+                <input type="number" class="form-control" name="prnt_rstra" id="prnt_rstra"
+                       value="{{ form.prnt_rstra.data or '0' }}">
+            </div>
+        </div>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">저장하기</button>
+    </form>
+</div>
+{% endblock %}

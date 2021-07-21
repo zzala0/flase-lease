@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-3">
+    <!-- flash 오류 -->
+    {% if report.msgtype != 'success' %}
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-danger" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% else %}
+    {% for message in get_flashed_messages() %}
+    <script> alert("{{ message }}") </script>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post" class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">조회기간</span>
+        </div>
+        <input type="date" aria-label="todate" class="form-control" id="todate" name="todate"
+               value="{{ report.todate or '' }}" required>
+        <button class="btn btn-outline-secondary ml-3" type="submit" value="조회" name="display">조회</button>
+        <button class="btn btn-success ml-3" type="submit" value="다운로드" name="download">다운로드</button>
+    </form>
+
+    <!-- 조회기간 수익비용 출력 -->
+    <div class="table-responsive-xl my-3">
+    <table class="table table-sm table-bordered">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center"></th>
+            <th colspan="2" class="text-center">리스부채</th>
+            <th colspan="2" class="table-success text-center">보증금</th>
+            <th colspan="2" class="table-warning text-center">복구충당부채</th>
+            <th colspan="3" class="table-info text-center">사용권자산</th>
+        </tr>
+        <tr class="thead-dark">
+            <th class="text-center">번호</th>
+            <th class="text-center">리스료</th>
+            <th class="text-center">이자비용</th>
+            <th class="text-center">리스부채</th>
+            <th class="text-center">보증금현할차</th>
+            <th class="text-center">보증금유효이자</th>
+            <th class="text-center">충당부채전입액</th>
+            <th class="text-center">복구충당부채</th>
+            <th class="text-center">자산상각비</th>
+            <th class="text-center">상각누계</th>
+            <th class="text-center">자산금액</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% if balance %}
+            {% for balance in balance %}
+            <tr {% if balance.leasecls_id == '0' %} class="table-warning"{% endif%}>
+                <td class="text-right">{{ balance.id }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.lease_fee) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.lease_exp) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.lease_lbt) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.deposit_dscnt) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.deposit_intr) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.rstr_exp) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.rstr_alw) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.lease_dep) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.dep_accum) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.lease_acq) }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td class="text-center"></td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block script %}
+
+<script type='text/javascript'>
+$(document).ready(function(){
+    $(".download").on('load', function() {
+        alert("바탕화면/다운로드 폴더에 파일이 생성되었습니다.")
+    });
+});
+</script>
+
+{% endblock %}

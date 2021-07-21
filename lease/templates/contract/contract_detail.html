@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <h3>{{ contract.subject }}</h3>
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex w-100">
+                <h6>{{ contract.startdate }} ~ {{ contract.enddate }}</h6>
+            </div>
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>할인율</span>
+                <span>{{ '{} %'.format(contract.rate|percent) }}</span>
+            </div>
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>리스료</span>
+                <span>{{ '{:,}'.format(contract.lease_fee) }}</span>
+            </div>
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>최초리스료</span>
+                <span>{{ '{:,}'.format(contract.init_fee) }}</span>
+            </div>
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>보증금</span>
+                <span>{{ '{:,}'.format(contract.deposit) }}</span>
+            </div>
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>복구충당부채</span>
+                <span>{{ '{:,}'.format(contract.rstr_alwn) }}</span>
+            </div>
+            <div class="my-3 d-flex w-100 justify-content-between">
+                <span>
+                    {% if contract.schedule_set|length == 0 %}
+                    <a href="{{ url_for('contract.modify', contract_id=contract.id) }}"
+                       class="btn btn-sm btn-outline-secondary">수정</a>
+                    {% endif %}
+                    <a href="#" class="delete btn btn-sm btn-outline-secondary"
+                        data-uri="{{ url_for('contract.delete', contract_id=contract.id) }}">삭제</a>
+                </span>
+                <small class="text-right badge badge-light p-2">{{ contract.create_date|datetime }}</small>
+            </div>
+
+            {% if contract.baseline_set|length == 1 %}
+            {% for baseline in contract.baseline_set %}
+            {% if baseline.prnt_depac != 0 %}
+            {% if baseline.prnt_asset != 0 %}
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>이전 사용권자산</span>
+                <span>{{ '{:,}'.format(baseline.prnt_asset+baseline.prnt_depac) }}
+            </div>
+            {% endif  %}
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>이전 상각누계액</span>
+                <span>{{ '{:,}'.format(baseline.prnt_depac) }}</span>
+            </div>
+            {% endif  %}
+            {% if baseline.prnt_asset != 0 %}
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>이전 자산 순액</span>
+                <span>{{ '{:,}'.format(baseline.prnt_asset) }}
+            </div>
+            {% endif  %}
+            {% if baseline.prnt_lblti != 0 %}
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>이전 리스부채</span>
+                <span>{{ '{:,}'.format(baseline.prnt_lblti) }}</span>
+            </div>
+            {% endif  %}
+            {% if baseline.prnt_dpsit != 0 %}
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>이전 보증금현할차</span>
+                <span>{{ '{:,}'.format(baseline.prnt_dpsit) }}</span>
+            </div>
+            {% endif  %}
+            {% if baseline.prnt_rstra != 0 %}
+            <div class="d-flex w-50 justify-content-between border-bottom">
+                <span>이전 복구충당부채</span>
+                <span>{{ '{:,}'.format(baseline.prnt_rstra) }}</span>
+            </div>
+            {% endif  %}
+            {% endfor  %}
+            {% endif  %}
+        </div>
+    </div>
+    {% if contract.baseline_set|length > 1 %}
+    <h5 class="border-bottom my-3 py-1">{{ contract.baseline_set|length - 1 }}회의 계약 변경이 있습니다.</h5>
+    <ul class="list-group list-group-flush">
+    {% for baseline in contract.baseline_set %}
+    <li class="list-group">
+        <a href="{{ url_for('baseline.detail', baseline_id=baseline.id) }}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h6 class="text-primary">{{ baseline.startdate }} ~ {{ baseline.enddate }}</h6>
+                <small class="badge badge-light p-2">{{ baseline.create_date|datetime }}</small>
+            </div>
+            <p class="mb-1">
+                {{ '{} %'.format(baseline.rate|percent) }}
+                | {{ '{:,}'.format(baseline.lease_fee) }}
+                | {{ '{:,}'.format(baseline.deposit) }}
+                | {{ '{:,}'.format(baseline.rstr_alwn) }}
+            </p>
+        </a>
+    </li>
+    {% endfor  %}
+    </ul>
+    {% endif  %}
+
+    <a href="{{ url_for('baseline.create', contract_id=contract.id) }}" class="btn btn-primary my-3">스케줄 생성</a>
+    {% if contract.baseline_set|length == 1 %}
+    <a href="#" class="delete btn btn-secondary"
+       data-uri="{{ url_for('baseline.delete1', contract_id=contract.id) }}">스케줄 삭제</a>
+    {% endif  %}
+
+    {% if contract.schedule_set %}
+    <h5>{{ contract.schedule_set|length - 1 }}회의 스케줄이 생성되었습니다.</h5>
+
+    <!-- 스케줄 출력 Start -->
+    <div class="table-responsive-xl">
+    <table id="example-table-1" class="table table-sm table-bordered table-hover table-striped">
+        {% include "contract/schedule_head.html" %}
+        <tbody>
+        {% for cycle in cycle %}
+        <tr {% if contract.schedule_set[cycle].cycle == 0 %} class="table-primary"{% endif%}>
+            <td class="text-center">{{ contract.schedule_set[cycle].cycle }}</td>
+            <td class="text-right">{{ contract.schedule_set[cycle].exemonth|month }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].lease_fee) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].lease_exp) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].lease_lbt) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].deposit_dscnt) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].deposit_intr) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].rstr_exp) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].rstr_alw) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].lease_dep) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].lease_ast) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].dep_accum) }}</td>
+            {% if contract.schedule_set[cycle].cycle == 0 %}
+            <td class="bg-info text-right table-info" onclick="location.href='#"
+                data-toggle="modal" data-target="#staticBackdrop">
+                {{ '{:,}'.format(contract.schedule_set[cycle].lease_acq) }}
+            </td>
+            {% else %}
+            <td class="text-right">{{ '{:,}'.format(contract.schedule_set[cycle].lease_acq) }}</td>
+            {% endif %}
+
+            <!-- 분개 출력을 위한 숨김열 -->
+            <td class="text-right hidden-col" id="리스부채차이">
+                {% if cycle > 0 %}
+                {{ (contract.schedule_set[cycle].lease_lbt - contract.schedule_set[cycle-1].lease_lbt) }}
+                {% else %}0{% endif %}
+            </td>
+            <td class="text-right hidden-col" id="보증금현할차차이">
+                {% if cycle > 0 %}
+                {{ (contract.schedule_set[cycle].deposit_dscnt - contract.schedule_set[cycle-1].deposit_dscnt) }}
+                {% else %}0{% endif %}
+            </td>
+            <td class="text-right hidden-col" id="복구충당부채차이">
+                {% if cycle > 0 %}
+                {{ (contract.schedule_set[cycle].rstr_alw - contract.schedule_set[cycle-1].rstr_alw) }}
+                {% else %}0{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% endif %}
+</div>
+
+{% include "contract/contract_modal.html" %}
+
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+$(document).ready(function(){
+    $(".delete").on('click', function() {
+        if(confirm("정말로 삭제하시겠습니까?")) {
+            location.href = $(this).data('uri');
+        }
+    });
+});
+
+// 테이블의 Row 클릭시 값 가져오기
+$("#example-table-1 tr").click(function(){
+
+    var str = ""
+    var tdArr = new Array();	// 배열 선언
+
+    // 현재 클릭된 Row(<tr>)
+    var tr = $(this);
+    var td = tr.children();
+
+    // tr.text()는 클릭된 Row 즉 tr에 있는 모든 값을 가져온다.
+    console.log("클릭한 Row의 모든 데이터 : "+tr.text());
+
+    // 반복문을 이용해서 배열에 값을 담아 사용할 수 도 있다.
+    td.each(function(i){
+        tdArr.push(td.eq(i).text());
+    });
+
+    console.log("배열에 담긴 값 : "+tdArr);
+
+    // td.eq(index)를 통해 값을 가져올 수도 있다.
+    var no = td.eq(0).text();
+
+    // ----------------------
+    var lblt = td.eq(13).text();
+    var dept = td.eq(14).text();
+    var rstr = td.eq(15).text();
+    var lease = Number(lblt) + Number(dept) + Number(rstr);
+
+    // 이전 상각스케줄 정보가 없을 경우, 최초계약 기준으로 값을 저장한다.
+    var lease_txt = "최초 인식 분개";
+    if(Number(lease)==0){
+        lease = td.eq(11).text();   lease = lease.replace(/,/g, '');
+        lblt = td.eq(4).text();     lblt = lblt.replace(/,/g, '');
+        dept = td.eq(5).text();     dept = dept.replace(/,/g, '');
+        rstr = td.eq(8).text();     rstr = rstr.replace(/,/g, '');
+    } else {
+        lease_txt = "계약 변경 분개";
+    }
+
+    // 계약변경 분개 차변
+    var debit = ""
+    if(Number(lease)>0){
+        lease = String(lease);
+        lease = lease.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        debit = "<tr><td>사용권자산</td><td class='text-right'>" + lease + "</td></tr>";
+    }
+
+    if(Number(lblt)<0){
+        lblt = String(Math.abs(Number(lblt)));
+        lblt = lblt.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        debit = debit + "<tr><td>리스부채</td><td class='text-right'>" + lblt + "</td></tr>";
+    }
+
+    if(Number(dept)<0){
+        dept = String(Math.abs(Number(dept)));
+        dept = dept.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        debit = debit + "<tr><td>보증금현할차</td><td class='text-right'>" + dept + "</td></tr>";
+    }
+
+    if(Number(rstr)<0){
+        rstr = String(Math.abs(Number(rstr)));
+        rstr = rstr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        debit = debit + "<tr><td>복구충당부채</td><td class='text-right'>" + rstr + "</td></tr>";
+    }
+
+    // 계약변경 분개 대변
+    var credit = ""
+    if(Number(lease)<0){
+        lease = String(Math.abs(Number(lease)));
+        lease = lease.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        credit = "<tr><td>사용권자산</td><td class='text-right'>" + lease + "</td></tr>";
+    }
+
+    if(Number(lblt)>0){
+        lblt = lblt.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        credit = credit + "<tr><td>리스부채</td><td class='text-right'>" + lblt + "</td></tr>";
+    }
+
+    if(Number(dept)>0){
+        dept = dept.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        credit = credit + "<tr><td>보증금현할차</td><td class='text-right'>" + dept + "</td></tr>";
+    }
+
+    if(Number(rstr)>0){
+        rstr = rstr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        credit = credit + "<tr><td>복구충당부채</td><td class='text-right'>" + rstr + "</td></tr>";
+    }
+
+    // ----------------------
+    str +=	" * 클릭된 Row의 td값 = No. : <font color='red'>" + no + "</font>" +
+            ", 부채 : <font color='red'>" + lblt + "</font>" +
+            ", 현할차 : <font color='red'>" + dept + "</font>" +
+            ", 복구충당 : <font color='red'>" + rstr + "</font>" +
+            ", 합계 : <font color='red'>" + lease + "</font>";
+
+<!--    $("#ex1_Result1").html(" * 클릭한 Row의 모든 데이터 = " + tr.text());-->
+<!--    $("#ex1_Result2").html(str);-->
+    $("#lease_txt").html(lease_txt);
+    $("#debit").html(debit);
+    $("#credit").html(credit);
+});
+</script>
+
+{% endblock %}

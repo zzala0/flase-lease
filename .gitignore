@@ -1,0 +1,6 @@
+.idea
+lease.db
+*.pyc
+__pycache__
+massimport.py
+massexec.py

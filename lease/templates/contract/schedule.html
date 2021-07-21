@@ -1,0 +1,49 @@
+<!-- 상각스케줄 출력 -->
+<div class="table-responsive-xl">
+<table class="table table-sm table-bordered table-hover table-striped">
+    <thead>
+    <tr>
+        <th colspan="3" class="text-center"></th>
+        <th colspan="2" class="text-center">리스부채</th>
+        <th colspan="2" class="table-success text-center">보증금</th>
+        <th colspan="2" class="table-warning text-center">복구충당부채</th>
+        <th colspan="3" class="table-info text-center">사용권자산</th>
+    </tr>
+    <tr class="thead-dark">
+        <th class="text-center">#</th>
+        <th class="text-center">지급월</th>
+        <th class="text-center">리스료</th>
+        <th class="text-center">이자비용</th>
+        <th class="text-center">리스부채</th>
+        <th class="text-center">보증금현할차</th>
+        <th class="text-center">보증금유효이자</th>
+        <th class="text-center">충당부채전입액</th>
+        <th class="text-center">복구충당부채</th>
+        <th class="text-center">자산상각비</th>
+        <th class="text-center">상각누계</th>
+        <th class="text-center">자산잔액</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for schedule in contract.schedule_set %}
+    <tr {% if schedule.cycle == 0 %} class="table-primary"{% endif%}>
+        <td class="text-center">{{ schedule.cycle }}</td>
+        <td class="text-right">{{ schedule.exemonth|month }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.lease_fee) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.lease_exp) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.lease_lbt) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.deposit_dscnt) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.deposit_intr) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.rstr_exp) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.rstr_alw) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.lease_dep) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.dep_accum) }}</td>
+        {% if schedule.cycle == 0 %}
+        <td class="bg-primary text-light text-right">{% else %}<td class="text-right">
+        {% endif %}
+        {{ '{:,}'.format(schedule.lease_ast) }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>

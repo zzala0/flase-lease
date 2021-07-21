@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h5 class="my-3 border-bottom pb-2">계약 변경</h5>
+    <form method="post" class="post-form my-3">
+        {{ form.csrf_token }}
+        <!-- 오류표시 Start -->
+        {% include "form_errors.html" %}
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="startdate">종전 계약시작일</label>
+                <input type="date" class="form-control" name="startdate" id="startdate"
+                       value="{{ form.startdate.data or '' }}" readonly>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="changedate">수정계약일</label>
+                <input type="date" class="form-control" name="changedate" id="changedate"
+                       value="{{ form.changedate.data or '' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="enddate">계약종료일</label>
+                <input type="date" class="form-control" name="enddate" id="enddate"
+                       value="{{ form.enddate.data or '' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="rate">할인율</label>
+                <input type="number" step="0.000001" class="form-control" name="rate" id="rate"
+                       value="{{ form.rate.data or '' }}">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="lease_fee">고정리스료</label>
+                <input type="number" class="form-control" name="lease_fee" id="lease_fee"
+                       value="{{ form.lease_fee.data or '0' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="deposit">보증금</label>
+                <input type="number" class="form-control" name="deposit" id="deposit"
+                       value="{{ form.deposit.data or '0' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="rstr_alwn">복구충당부채</label>
+                <input type="number" class="form-control" name="rstr_alwn" id="rstr_alwn"
+                       value="{{ form.rstr_alwn.data or '0' }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">저장하기</button>
+    </form>
+</div>
+{% endblock %}

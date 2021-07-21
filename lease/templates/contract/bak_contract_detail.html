@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <h2 class="border-bottom py-2">{{ contract.subject }}</h2>
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text" style="white-space: pre-line;">{{ contract.startdate }}
+                {{ contract.enddate }}
+                {{ contract.lease_fee }}
+            </div>
+            <div class="d-flex justify-content-end">
+                <div class="badge badge-light p-2">
+                    {{ contract.create_date|datetime }}
+                </div>
+            </div>
+            <div class="my-3">
+                <a href="{{ url_for('contract.modify', contract_id=contract.id) }}"
+                   class="btn btn-sm btn-outline-secondary">수정</a>
+            </div>
+        </div>
+    </div>
+
+    <form action="{{ url_for('schedule.create', contract_id=contract.id) }}" method="post" class="my-3">
+        <input type="submit" value="스케줄등록" class="btn btn-primary">
+    </form>
+
+    {% if contract.schedule_set %}
+
+    <h5>{{ contract.schedule_set|length - 1 }}회의 스케줄이 있습니다.</h5>
+
+    <div class="table-responsive-xl">
+    <table class="table table-sm table-bordered table-hover table-striped">
+        <thead>
+        <tr class="thead-dark">
+            <th class="text-center">#</th>
+            <th class="text-center">지급월</th>
+            <th class="text-center">리스료</th>
+<!--            <th class="text-center">리스부채</th>-->
+            <th class="text-center">리스부채장부</th>
+            <th class="text-center">이자비용</th>
+            <th class="text-center">보증금현할차</th>
+            <th class="text-center">보증금유효이자</th>
+            <th class="text-center">충당부채전입액</th>
+            <th class="text-center">복구충당부채</th>
+            <th class="text-center">자산상각비</th>
+            <th class="text-center">사용권자산</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for schedule in contract.schedule_set %}
+        <tr>
+            <td class="text-center">{{ loop.index - 1 }}</td>
+            <td class="text-right">{{ contract.startdate|month }}</td>
+            <td class="text-right">{{ '{:,}'.format(schedule.lease_lblt) }}</td>
+<!--            <td></td>-->
+            <td class="text-right">{{ '{:,}'.format(schedule.lease_lblt) }}</td>
+            <td class="text-right">{{ '{:,}'.format(schedule.intr_exp) }}</td>
+            <td class="text-right">{{ '{:,}'.format(schedule.deposit_dscnt) }}</td>
+            <td class="text-right">{{ '{:,}'.format(schedule.deposit_dscnt) }}</td>
+            <td class="text-right">{{ '{:,}'.format(schedule.intr_exp) }}</td>
+            <td class="text-right">{{ '{:,}'.format(schedule.intr_exp) }}</td>
+            <td class="text-right">{{ '{:,}'.format(schedule.intr_exp) }}</td>
+            <td class="text-right">{{ '{:,}'.format(schedule.intr_exp) }}</td>
+        </tr>
+<!--        {% if schedule.intr_exp == 503263 %}-->
+<!--        <tr>-->
+<!--            <td class="text-center">{{ loop.index - 1 }}</td>-->
+<!--        </tr>-->
+<!--        {% endif %}-->
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

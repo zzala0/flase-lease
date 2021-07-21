@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-3">
+    <!-- flash 오류 -->
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-danger" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    <form method="post" class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">조회기간</span>
+        </div>
+        <input type="date" aria-label="frdate" class="form-control" id="frdate" name="frdate"
+               value="{{ report.frdate or '' }}" required>
+        <input type="date" aria-label="todate" class="form-control" id="todate" name="todate"
+               value="{{ report.todate or '' }}" required>
+        <button class="btn btn-outline-secondary ml-3" type="submit" id="display">조회</button>
+    </form>
+
+    <!-- 조회기간 수익비용 출력 -->
+    <div class="table-responsive-xl my-3">
+    <table class="table table-sm table-bordered">
+        <thead>
+        <tr class="thead-dark">
+            <th class="text-center">리스구분</th>
+            <th class="text-center">리스료</th>
+            <th class="text-center">리스 이자비용</th>
+            <th class="text-center">보증금 이자수익</th>
+            <th class="text-center">복구충당부채 전입</th>
+            <th class="text-center">사용권자산 상각비</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% if prdpl %}
+            {% for prdpl in prdpl %}
+            <tr {% if prdpl.leasecls_id == '0' %} class="table-warning"{% endif%}>
+                <td class="text-center">{{ prdpl.clsname }}</td>
+                <td class="text-right">{{ '{:,}'.format(prdpl.lease_fee) }}</td>
+                <td class="text-right">{{ '{:,}'.format(prdpl.lease_exp) }}</td>
+                <td class="text-right">{{ '{:,}'.format(prdpl.deposit_intr) }}</td>
+                <td class="text-right">{{ '{:,}'.format(prdpl.rstr_exp) }}</td>
+                <td class="text-right">{{ '{:,}'.format(prdpl.lease_dep) }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td class="text-center"></td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    </div>
+
+    <!-- 조회시점 말 잔액 출력 -->
+    <div class="table-responsive-xl my-3">
+        <table class="table table-sm table-bordered">
+            <thead>
+            <tr class="thead-dark">
+                <th class="text-center">리스구분</th>
+                <th class="text-center">리스부채</th>
+                <th class="text-center">보증금현할차</th>
+                <th class="text-center">복구충당부채</th>
+                <th class="text-center">사용권자산</th>
+                <th class="text-center">감가상각누계액</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if balance %}
+            {% for balance in balance %}
+            <tr {% if balance.leasecls_id == '0' %} class="table-warning"{% endif%}>
+                <td class="text-center">{{ balance.clsname }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.lease_lbt) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.deposit_dscnt) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.rstr_alw) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.lease_acq) }}</td>
+                <td class="text-right">{{ '{:,}'.format(balance.dep_accum) }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td class="text-center"></td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+                <td class="text-right">0</td>
+            </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 시작시점 잔액 출력 -->
+    <div class="table-responsive-xl my-3">
+        <h5>시작시점 잔액</h5>
+        <table class="table table-sm table-bordered">
+            <thead>
+            <tr class="thead-light">
+                <th class="text-center">리스부채</th>
+                <th class="text-center">보증금현할차</th>
+                <th class="text-center">복구충당부채</th>
+                <th class="text-center">사용권자산</th>
+                <th class="text-center">감가상각누계액</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="text-right">{{ '{:,}'.format(report.mig_lease_lbt) }}</td>
+                <td class="text-right">{{ '{:,}'.format(report.mig_deposit_dscnt) }}</td>
+                <td class="text-right">{{ '{:,}'.format(report.mig_rstr_alw) }}</td>
+                <td class="text-right">{{ '{:,}'.format(report.mig_lease_ast) }}</td>
+                <td class="text-right">{{ '{:,}'.format(report.mig_dep_accum) }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 마이그레이션 잔액 출력 -->
+    <div class="table-responsive-xl my-3">
+        <h5>마이그레이션 잔액</h5>
+        <table class="table table-sm table-bordered">
+            <thead>
+            <tr class="thead-light">
+                <th class="text-center">리스부채</th>
+                <th class="text-center">보증금현할차</th>
+                <th class="text-center">복구충당부채</th>
+                <th class="text-center">사용권자산</th>
+                <th class="text-center">감가상각누계액</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="text-right">{{ '{:,}'.format(report.prnt_lblti) }}</td>
+                <td class="text-right">{{ '{:,}'.format(report.prnt_dpsit) }}</td>
+                <td class="text-right">{{ '{:,}'.format(report.prnt_rstra) }}</td>
+                <td class="text-right">{{ '{:,}'.format(report.prnt_asset) }}</td>
+                <td class="text-right">{{ '{:,}'.format(report.prnt_depac) }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

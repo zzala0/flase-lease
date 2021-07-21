@@ -1,0 +1,20 @@
+    <tr {% if schedule.cycle == 0 %} class="table-primary"{% endif%}>
+        <td class="text-center">{{ schedule.cycle }}</td>
+        <td class="text-right">{{ schedule.exemonth|month }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.lease_fee) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.lease_exp) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.lease_lbt) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.deposit_dscnt) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.deposit_intr) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.rstr_exp) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.rstr_alw) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.lease_dep) }}</td>
+        <td class="text-right">{{ '{:,}'.format(schedule.dep_accum) }}</td>
+        {% if schedule.cycle == 0 %}
+        <td class="bg-info text-right table-info" onclick="location.href='#" data-toggle="modal" data-target="#staticBackdrop">
+                {{ '{:,}'.format(schedule.lease_ast) }}
+        </td>
+        {% else %}
+        <td class="text-right">{{ '{:,}'.format(schedule.lease_ast) }}</td>
+        {% endif %}
+    </tr>

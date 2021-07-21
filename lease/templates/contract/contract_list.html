@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+<!-- 찾기 -->
+    <div class="row justify-content-end my-3">
+        <div class="col-4 input-group">
+            <input type="text" class="form-control kw" value="{{ kw or '' }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+            </div>
+        </div>
+    </div>
+<!-- 찾기 -->
+    <table class="table">
+        <thead>
+        <tr class="text-center thead-dark">
+            <th>번호</th>
+            <th>구분</th>
+            <th style="width:40%">계약명</th>
+            <th>계약시작일</th>
+            <th>계약종료일</th>
+            <th>할인율</th>
+            <th>고정리스료</th>
+            <th>작성자</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if contract_list %}
+        {% for contract in contract_list.items %}
+        <tr class="text-center">
+            <td>{{ contract.id }}</td>
+            <td>{{ contract.leasecls.clsname }}</td>
+            <td class="text-left">
+                <a href="{{ url_for('contract.detail', contract_id=contract.id) }}">{{ contract.subject }}</a>
+                {% if contract.baseline_set|length > 1 %}
+                <span class="badge badge-info small ml-1">{{ contract.baseline_set|length - 1 }}</span>
+                {% endif %}
+            </td>
+            <td>{{ contract.startdate }}</td>
+            <td>{{ contract.enddate }}</td>
+            <td>{{ '{} %'.format(contract.rate|percent) }}</td>
+            <td class="text-right">{{ '{:,}'.format(contract.lease_fee) }}</td>
+            <td>{{ contract.user.username }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="3">등록된 계약이 없습니다.</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+    <!-- 페이징처리 시작 -->
+    <ul class="pagination justify-content-center">
+        <!-- 이전페이지 -->
+        {% if contract_list.has_prev %}
+        <li class="page-item">
+            <a class="page-link" data-page="{{ contract_list.prev_num }}" href="#">이전</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+        </li>
+        {% endif %}
+        {% for page_num in contract_list.iter_pages() %}
+            {% if page_num %}
+                {% if page_num != contract_list.page %}
+                <li class="page-item">
+                    <a class="page-link" data-page="{{ page_num }}" href="#">{{ page_num }}</a>
+                </li>
+                {% else %}
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="#">{{ page_num }}</a>
+                </li>
+                {% endif %}
+           {% else %}
+                <li class="disabled">
+                    <a class="page-link" href="#">...</a>
+                </li>
+           {% endif %}
+        {% endfor %}
+        <!-- 다음페이지 -->
+        {% if contract_list.has_next %}
+        <li class="page-item">
+            <a class="page-link" data-page="{{ contract_list.next_num }}" href="#">다음</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
+        </li>
+        {% endif %}
+    </ul>
+    <!-- 페이징처리 끝 -->
+    <a href="{{ url_for('contract.create') }}" class="btn btn-primary">계약 등록</a>
+</div>
+<form id="searchForm" method="get" action="{{ url_for('contract._list') }}">
+    <input type="hidden" id="kw" name="kw" value="{{ kw or '' }}">
+    <input type="hidden" id="page" name="page" value="{{ page }}">
+</form>
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+$(document).ready(function(){
+    $(".page-link").on('click', function() {
+        $("#page").val($(this).data("page"));
+        $("#searchForm").submit();
+    });
+    $("#btn_search").on('click', function() {
+        $("#kw").val($(".kw").val());
+        $("#page").val(1);  // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
+        $("#searchForm").submit();
+    });
+});
+</script>
+{% endblock %}
